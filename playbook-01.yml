@@ -1,0 +1,13 @@
+##NAO ALTERAR!!!!!!######
+#Role for ALL
+- hosts: localhost
+  become: true
+  vars_files:
+    - vars/aws-account-env.yml
+    - vars/lnx-credentials-env.yml
+    - ans-shared-vars/lnx-nginx-std-app.yml
+  roles:
+    - aws-replace
+##FIM NAO ALTERAR!!!!!!######
+
+

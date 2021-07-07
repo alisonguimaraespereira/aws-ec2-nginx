@@ -1,0 +1,15 @@
+prefix_hostname: "{{ prefix_stack_hostname }}"
+stack_name: "{{ prefix_stack_name }}"
+aws_region: us-east-1
+env: snd
+vpi_id: vpc-9663d6ec
+subnet:
+  a: subnet-790f961e
+  b: subnet-aad5b184 
+kms_id: 
+aws_account_id: 701782107348
+ami_id: "{{ ami_id_rhel8 }}"
+ami_id_rhel7: 
+ami_id_rhel8: ami-01fc429821bf1f4b4
+##Identity_ssh
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

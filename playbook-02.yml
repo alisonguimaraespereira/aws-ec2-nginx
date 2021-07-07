@@ -1,0 +1,14 @@
+##NAO ALTERAR!!!!!!######
+#Role for ALL
+- hosts: nginx
+  become: true
+  vars_files:
+    - ans-shared-vars/aws-account-env.yml
+    - ans-shared-vars/lnx-nginx-std-app.yml
+
+  roles:
+    - hostname
+    - nginx-std
+    - nginx-vhost-std
+
+##FIM NAO ALTERAR!!!!!!######

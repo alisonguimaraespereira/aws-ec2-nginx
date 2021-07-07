@@ -1,0 +1,2 @@
+app_name: nginx
+hostname: "{{ app_name }}{{(groups.nginx.index(inventory_hostname) + 1)}}"

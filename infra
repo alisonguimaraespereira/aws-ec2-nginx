@@ -1,0 +1,89 @@
+#!/bin/bash
+
+set -e
+
+#Path Variable
+dir=$pwd
+#Terraform Binary Path
+export ANSIBLE_VAULT_PASSWORD_FILE=~/.ansible/vault
+TERRAFORM="/usr/local/bin/terraform"
+#Terraform-Inventory Binary Path
+TERRAFORM_INVENTORY="/usr/local/bin/terraform-inventory"
+ANSIBLE_PLAYBOOK="/usr/local/bin/ansible-playbook"
+ANSIBLE_CONFIG="ansible.cfg"
+case $1 in
+   vars)
+                cd "$dir"
+                #call Ansible for Terraform
+                $ANSIBLE_PLAYBOOK playbook-01.yml -i spobrcatalog
+                ;;
+   up)
+echo "Apply Terraform Plan"
+cd "$dir"
+                #Inicia o Terraform
+$TERRAFORM init
+#Implementa a Infra Estrutura
+$TERRAFORM apply -auto-approve
+#Efetua o Download do terraform state
+$TERRAFORM show -json > terraform.tfstate
+#Provisionamento da Infra Estrutura
+$TERRAFORM_INVENTORY -inventory > hosts
+#Tratamento para playbook
+chmod +x inventory_fix.sh
+sh inventory_fix.sh
+#call Ansible
+echo "Aguardando Inicio da Instancia - 5 Minutos"
+sleep 300
+$ANSIBLE_PLAYBOOK playbook-02.yml -i hosts
+;;
+  upt)
+echo "Apply Terraform Plan"
+cd "$dir"
+                #Inicia o Terraform
+$TERRAFORM init
+#Implementa a Infra Estrutura
+$TERRAFORM apply -auto-approve
+;;
+  upa)
+echo "Apply Terraform Plan"
+cd "$dir"
+#call Ansible
+echo "Aguardando Inicio da Instancia - 5 Minutos"
+$ANSIBLE_PLAYBOOK playbook-02.yml -i hosts
+;;  
+   k8s)
+echo "Apply Terraform Plan"
+cd "$dir"
+                #Inicia o Terraform
+$TERRAFORM init
+#Implementa a Infra Estrutura
+$TERRAFORM apply -auto-approve
+#Efetua o Download do terraform state
+$TERRAFORM show -json > terraform.tfstate
+#Provisionamento da Infra Estrutura
+$TERRAFORM_INVENTORY -inventory > hosts
+#Tratamento para playbook
+chmod +x inventory_fix.sh
+./inventory_fix.sh
+#call Ansible
+echo "Aguardando Inicio da Instancia - 5 Minutos"
+sleep 300
+$ANSIBLE_PLAYBOOK playbook-02.yml -i hosts
+cd ans-shared-roles/kubespray
+$ANSIBLE_PLAYBOOK -i inventory/serasa/hosts.yml --become cluster.yml
+cd -
+$ANSIBLE_PLAYBOOK playbook-k8s-deploy.yml -i hosts
+;;
+  down)
+    echo "Destroy Terraform Plan"
+cd "$dir"
+                $TERRAFORM init
+                $TERRAFORM destroy -auto-approve
+rm -f terraform.tfstate
+rm -f hosts
+;;
+  *)
+echo "Please, Inform  up or down"
+;;
+
+  esac
